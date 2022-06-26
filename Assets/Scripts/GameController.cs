@@ -61,5 +61,20 @@ public class GameController : MonoBehaviour
                 }
             }
         }
+
+        if (Input.GetMouseButtonDown(1))
+        {
+            Collider2D targetObject = Physics2D.OverlapPoint(mousePosition);
+            if (targetObject)
+            {
+                selectedObject = targetObject.transform.gameObject;
+                GridCell cell = null;
+                if (selectedObject.TryGetComponent<GridCell>(out cell))
+                {
+                    cell.occupied = true;
+                    cell.TurnBlack();
+                }
+            }
+        }
     }
 }

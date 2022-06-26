@@ -10,8 +10,8 @@ public class GridCell : MonoBehaviour
     private SpriteRenderer spriteRenderer = null;
 
     public Vector2 Position { get; set; }
-
-    public bool Occupied { get; private set; }
+    [SerializeField]
+    public bool occupied = false;
 
     public int f = 0;
     public int g = 0;
@@ -24,11 +24,17 @@ public class GridCell : MonoBehaviour
         g = int.MaxValue;
         h = int.MaxValue;
         parent = null;
-        spriteRenderer.color = Color.white;
+        if (!occupied)
+            spriteRenderer.color = Color.white;
     }
 
     public void TurnRed()
     {
         spriteRenderer.color = Color.red;
+    }
+
+    public void TurnBlack()
+    {
+        spriteRenderer.color = Color.black;
     }
 }
