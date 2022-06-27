@@ -18,6 +18,7 @@ public class GameController : MonoBehaviour
     public GridCell[,] gridCells = null;
 
     private GameObject selectedObject = null;
+    private GridCell destination = null;
 
     private void Awake()
     {
@@ -28,15 +29,17 @@ public class GameController : MonoBehaviour
     {
         gridCells = new GridCell[gridWidth, gridHeight];
 
-        for (int i = 0; i < gridWidth; i++)
-        {
-            for (int j = 0; j < gridHeight; j++)
-            {
-                GameObject temp = Instantiate(gridcellPrefab, grid.transform);
-                temp.transform.localPosition = new Vector2(i, j);
-                temp.GetComponent<GridCell>().Position = new Vector2(i, j);
+        int i = 0, j = 0;
 
-                gridCells[i, j] = temp.GetComponent<GridCell>();
+        foreach(Transform cell in grid.transform)
+        {
+            cell.gameObject.GetComponent<GridCell>().Position = new Vector2(i, j);
+
+            gridCells[i, j] = cell.GetComponent<GridCell>();
+            if (++i == gridWidth)
+            {
+                i = 0;
+                j++;
             }
         }
 
@@ -54,25 +57,18 @@ public class GameController : MonoBehaviour
             if (targetObject)
             {
                 selectedObject = targetObject.transform.gameObject;
-                GridCell destination = null;
-                if(selectedObject.TryGetComponent<GridCell>(out destination))
+                GridCell temp = null;
+                if (selectedObject.TryGetComponent<GridCell>(out temp))
                 {
-                    movement.Astar(player.GetComponent<Character>().GetPosition(), destination);
-                }
-            }
-        }
-
-        if (Input.GetMouseButtonDown(1))
-        {
-            Collider2D targetObject = Physics2D.OverlapPoint(mousePosition);
-            if (targetObject)
-            {
-                selectedObject = targetObject.transform.gameObject;
-                GridCell cell = null;
-                if (selectedObject.TryGetComponent<GridCell>(out cell))
-                {
-                    cell.occupied = true;
-                    cell.TurnBlack();
+                    if (destination == null || destination != temp)
+                    {
+                        destination = temp;
+                        movement.Astar(player.GetComponent<Character>().GetPosition(), destination);
+                    }
+                    else if (destination == temp)
+                    {
+                        StartCoroutine(movement.MoveCharacter(player.GetComponent<Character>()));
+                    }
                 }
             }
         }

@@ -4,9 +4,11 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
+
     GridCell[,] gridCells = null;
     List<GridCell> openList;
     List<GridCell> closedList;
+    Stack<GridCell> path;
 
     int gridWidth;
     int gridHeight;
@@ -19,6 +21,7 @@ public class Movement : MonoBehaviour
         gridCells = GameController.Instance.gridCells;
         gridWidth = GameController.Instance.gridWidth;
         gridHeight = GameController.Instance.gridHeight;
+        path = new Stack<GridCell>();
     }
 
     public void Astar(GridCell a, GridCell b)
@@ -100,6 +103,18 @@ public class Movement : MonoBehaviour
         }
     }
 
+    public IEnumerator MoveCharacter(Character character)
+    {
+        
+        while(path.Count > 0)
+        {
+            GridCell cell = path.Pop();
+            yield return StartCoroutine(character.Move(cell.transform.position));
+            character.SetPosition(cell);
+            cell.Reset();
+        }
+    }
+
     private bool CheckSuccessor(GridCell successor, GridCell q)
     {
 
@@ -131,11 +146,12 @@ public class Movement : MonoBehaviour
 
     private void Trace(GridCell start, GridCell finish)
     {
+        path.Clear();
         GridCell cell = finish;
         do
         {
-            Debug.Log(cell.parent.Position);
             cell.TurnRed();
+            path.Push(cell);
             cell = cell.parent;
         } while (cell != start);
     }

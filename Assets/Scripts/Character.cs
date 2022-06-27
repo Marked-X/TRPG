@@ -4,19 +4,11 @@ using UnityEngine;
 
 public class Character : MonoBehaviour
 {
+    [SerializeField]
+    Animator animator = null;
+
     private GridCell position = null;
-    private Vector2 direction = Vector2.down;
-
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    private Vector3 direction = Vector3.down;
 
     public void SetPosition(GridCell cell)
     {
@@ -27,5 +19,23 @@ public class Character : MonoBehaviour
     public GridCell GetPosition()
     {
         return position;
+    }
+
+    public IEnumerator Move(Vector3 targetPos)
+    {
+        animator.SetBool("Moving", true);
+        direction = targetPos - transform.position;
+        animator.SetFloat("Horizontal", direction.x);
+        animator.SetFloat("Vertical", direction.y);
+
+        while ((targetPos - transform.position).sqrMagnitude > Mathf.Epsilon)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, targetPos, 4f * Time.deltaTime);
+            
+            yield return null;
+        }
+
+        transform.position = targetPos;
+        animator.SetBool("Moving", false);
     }
 }
