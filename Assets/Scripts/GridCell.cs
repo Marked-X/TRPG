@@ -10,7 +10,6 @@ public class GridCell : MonoBehaviour
     private SpriteRenderer spriteRenderer = null;
 
     public Vector2 Position { get; set; }
-    [SerializeField]
     public bool occupied = false;
 
     public int f = 0;
