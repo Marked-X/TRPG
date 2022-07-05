@@ -22,7 +22,7 @@ public class Pathfinding
         gridHeight = GameController.Instance.gridHeight;
     }
 
-    public void Astar(GridCell a, GridCell b)
+    public Stack<GridCell> Astar(GridCell a, GridCell b)
     {
         start = a;
         finish = b;
@@ -63,13 +63,30 @@ public class Pathfinding
 
                     if (CheckSuccessor(successor, q))
                     {
-                        return;
+                        return MakePath();
                     }
                 }
             }
 
             closedList.Add(q);
         }
+
+        Debug.Log(a.Position + ",  " + b.Position);
+        Debug.LogWarning("Path not found");
+        return null;
+    }
+
+    private Stack<GridCell> MakePath()
+    {
+        Stack<GridCell> path = new Stack<GridCell>();
+        GridCell temp = finish;
+        do
+        {
+            path.Push(temp);
+            temp = temp.parent;
+        } while (temp != start);
+
+        return path;
     }
 
     private bool CheckSuccessor(GridCell successor, GridCell q)
@@ -80,7 +97,7 @@ public class Pathfinding
             finish.parent = q;
             return true;
         }
-        else if (!closedList.Contains(successor) && !successor.occupied)
+        else if (!closedList.Contains(successor) && !successor.IsOccupied)
         {
             int newG, newH, newF;
 
@@ -108,7 +125,7 @@ public class Pathfinding
             return false;
     }
 
-    private int ManhattanDistance(Vector3 current, Vector3 target)
+    public int ManhattanDistance(Vector3 current, Vector3 target)
     {
         return (int)(Mathf.Abs(current.x - target.x) + Mathf.Abs(current.y - target.y));
     }

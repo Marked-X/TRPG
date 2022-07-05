@@ -28,7 +28,6 @@ public class GameController : MonoBehaviour
     void Start()
     {
         currentState = moving;
-        currentState.Enter();
         gridCells = new GridCell[gridWidth, gridHeight];
 
         int i = 0, j = 0;
@@ -47,6 +46,8 @@ public class GameController : MonoBehaviour
 
         player.GetComponent<Character>().SetPosition(gridCells[4, 3]);
         player.GetComponent<PlayerMovement>().Ready();
+
+        currentState.Enter();
     }
 
     void Update()
