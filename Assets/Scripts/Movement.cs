@@ -37,24 +37,27 @@ public class Movement : MonoBehaviour
     {
         radius.Clear();
 
+        List<GridCell> tempRadius = new();
+
         foreach (GridCell cell in GameController.Instance.gridCells)
         {
             if (pathfinding.ManhattanDistance(transform.position, cell.transform.position) <= currentMovementPoints)
             {
                 if (cell != character.GetPosition())
                 {
-                    radius.Add(cell);
+                    tempRadius.Add(cell);
                 }
             }
         }
 
-        Stack<GridCell> temp;
-        foreach (GridCell cell in radius)
+        Stack<GridCell> temp; //Stack for checking if there is a A* path to cell 
+        foreach (GridCell cell in tempRadius)
         {
             ReadyCells();
             temp = pathfinding.Astar(character.GetPosition(), cell);
             if (temp != null && temp.Count <= currentMovementPoints)
             {
+                radius.Add(cell);
                 cell.IsInRadius = true;
             }
         }

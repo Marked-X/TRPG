@@ -2,26 +2,36 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class StateMovement : State
 {
-    public override GameObject SelectedObject { get; set; }
-
+    public GameObject SelectedObject { get; set; }
     public PlayerMovement playerMovement = null;
+
+    private TextMeshProUGUI movementPointsText = null;
     private GridCell destination = null;
     private bool isMoving = false;
-    private bool isFreeroam = true;
+    private bool isFreeroam = false;
 
-    public override void Enter()
+    public override void Enter(GameObject characterGameObj)
     {
-        if (playerMovement == null)
-            playerMovement = GameController.Instance.player.GetComponent<PlayerMovement>();
+        if(!characterGameObj.TryGetComponent(out playerMovement))
+        {
+            Debug.LogError("Movement State couldn't find movement component");
+            return;
+        }
         playerMovement.OnMovementEnded += OnPlayerMovementEnded;
         playerMovement.ShowWalkingRadius();
+        movementPointsText = GameController.Instance.movementPointsText;
     }
 
     public override void Leave()
     {
+        foreach(GridCell cell in GameController.Instance.gridCells)
+        {
+            cell.ResetVisuals();
+        }
         playerMovement.OnMovementEnded -= OnPlayerMovementEnded;
     }
 
@@ -32,6 +42,7 @@ public class StateMovement : State
             playerMovement.RefreshMovementPoints();
             playerMovement.ShowWalkingRadius();
         }
+        movementPointsText.text = "Movement: " + playerMovement.CurrentMovementPoints;
     }
 
     public override void Update()

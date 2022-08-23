@@ -59,7 +59,19 @@ public class GridCell : MonoBehaviour
         }
     }
 
-    public bool IsOccupied { get; set; } = false;
+    public bool IsOccupied 
+    {
+        get
+        {
+            return isOccupied;
+        }
+        set
+        {
+            isOccupied = value;
+        }
+    }
+
+    public bool isOccupied = false;
 
     [HideInInspector]
     public int f = int.MaxValue;
@@ -76,6 +88,13 @@ public class GridCell : MonoBehaviour
         g = int.MaxValue;
         h = int.MaxValue;
         parent = null;
+        IsPath = false;
+    }
+
+    public void ResetVisuals() //can potentially move into Reset function
+    {
+        IsSelected = false;
+        IsInRadius = false;
         IsPath = false;
     }
 

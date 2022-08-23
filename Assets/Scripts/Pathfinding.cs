@@ -59,20 +59,21 @@ public class Pathfinding
                 int tempX = x + (int)direction.x, tempY = y + (int)direction.y;
                 if (IsValid(tempX, tempY))
                 {
-                    successor = gridCells[tempX, tempY];
-
-                    if (CheckSuccessor(successor, q))
+                    if(!gridCells[tempX, tempY].IsOccupied)
                     {
-                        return MakePath();
-                    }
+                        successor = gridCells[tempX, tempY];
+
+                        if (CheckSuccessor(successor, q))
+                        {
+                            return MakePath();
+                        }
+                    }                    
                 }
             }
 
             closedList.Add(q);
         }
 
-        Debug.Log(a.Position + ",  " + b.Position);
-        Debug.LogWarning("Path not found");
         return null;
     }
 
@@ -119,7 +120,7 @@ public class Pathfinding
 
     private bool IsValid(float x, float y)
     {
-        if (x < gridWidth && x >= 0 && y >= 0 & y < gridHeight)
+        if (x < gridWidth && x >= 0 && y >= 0 && y < gridHeight)
             return true;
         else
             return false;

@@ -43,7 +43,7 @@ public class PlayerMovement : Movement
 
     public bool Trace(GridCell finish)
     {
-        if (!radius.Contains(finish))
+        if (!radius.Contains(finish) || finish.IsOccupied)
             return false;
 
         GridCell start = character.GetPosition();

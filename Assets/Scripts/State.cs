@@ -4,9 +4,7 @@ using UnityEngine;
 
 public abstract class State
 {
-    public abstract GameObject SelectedObject { get; set; }
-
-    public abstract void Enter();
+    public abstract void Enter(GameObject characterGameObj);
 
     public abstract void Update();
 
