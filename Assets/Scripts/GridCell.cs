@@ -5,29 +5,47 @@ using UnityEngine;
 public class GridCell : MonoBehaviour
 {
     [SerializeField]
-    private Sprite sprite = null;
-    [SerializeField]
-    private SpriteRenderer spriteRenderer = null;
-    [SerializeField]
     private GameObject selectedBorder = null;
     [SerializeField]
-    private GameObject radiusBorder = null;
+    private GameObject walkRadiusBorder = null;
+    [SerializeField]
+    private GameObject skillRadiusBorder = null;
+    [SerializeField]
+    private GameObject targetBorder = null;
     [SerializeField]
     private GameObject pathBorder = null;
+    
+    [field: SerializeField]
+    public SpriteRenderer SpriteRenderer { get; private set; }
+
 
     public Vector2 Position { get; set; }
 
-    private bool isInRadius;
-    public bool IsInRadius
+    private bool isInWalkRadius;
+    public bool IsInWalkRadius
     {
         get
         {
-            return isInRadius;
+            return isInWalkRadius;
         }
         set
         {
-            isInRadius = value;
-            radiusBorder.SetActive(value);
+            isInWalkRadius = value;
+            walkRadiusBorder.SetActive(value);
+        }
+    }
+
+    private bool isInSkillRadius;
+    public bool IsInSkillRadius
+    {
+        get
+        {
+            return isInSkillRadius;
+        }
+        set
+        {
+            isInSkillRadius = value;
+            skillRadiusBorder.SetActive(value);
         }
     }
 
@@ -42,6 +60,20 @@ public class GridCell : MonoBehaviour
         {
             isPath = value;
             pathBorder.SetActive(value);
+        }
+    }
+
+    private bool isTarget;
+    public bool IsTarget
+    {
+        get
+        {
+            return isTarget;
+        }
+        set
+        {
+            isTarget = value;
+            targetBorder.SetActive(value);
         }
     }
 
@@ -73,6 +105,24 @@ public class GridCell : MonoBehaviour
 
     public bool isOccupied = false;
 
+    private Character occupator = null;
+
+    public Character Occupator
+    { 
+        get 
+        {
+            return occupator;
+        }
+        set
+        {
+            occupator = value;
+            if (value)
+                IsOccupied = true;
+            else
+                IsOccupied = false;
+        } 
+    }
+
     [HideInInspector]
     public int f = int.MaxValue;
     [HideInInspector]
@@ -94,17 +144,32 @@ public class GridCell : MonoBehaviour
     public void ResetVisuals() //can potentially move into Reset function
     {
         IsSelected = false;
-        IsInRadius = false;
+        IsInWalkRadius = false;
+        IsInSkillRadius = false;
+        IsTarget = false;
         IsPath = false;
     }
 
     private void OnMouseEnter()
     {
         IsSelected = true;
+        if (Occupator)
+        {
+            GameController.Instance.targetInfo.TargetEnter(this);
+        }
     }
 
     private void OnMouseExit()
     {
         IsSelected = false;
+        GameController.Instance.targetInfo.TargetLeave();
+    }
+
+    public void GetAttacked(SkillSO skill)
+    {
+        if (Occupator)
+        {
+            Occupator.GetAttacked(skill);
+        }
     }
 }

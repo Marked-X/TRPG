@@ -8,12 +8,6 @@ public class PlayerMovement : Movement
     public delegate void MovementEnded();
     public event MovementEnded OnMovementEnded;
 
-    public void Ready()
-    {
-        character = gameObject.GetComponent<Character>();
-        pathfinding.Ready();
-    }
-
     public void MovePlayer()
     {
         StartCoroutine(Move());
@@ -31,8 +25,7 @@ public class PlayerMovement : Movement
         {
             GridCell cell = path.Pop();
             currentMovementPoints--;
-            yield return StartCoroutine(character.Move(cell.transform.position));
-            character.SetPosition(cell);
+            yield return StartCoroutine(character.Move(cell));
             cell.Reset();
         }
 

@@ -15,6 +15,15 @@ public class Pathfinding
     private GridCell start = null;
     private GridCell finish = null;
 
+    public Pathfinding() { }
+
+    public Pathfinding(GridCell[,] gridCells, int gridWidth, int gridHeight)
+    {
+        this.gridCells = gridCells;
+        this.gridWidth = gridWidth;
+        this.gridHeight = gridHeight;
+    }
+
     public void Ready()
     {
         gridCells = GameController.Instance.gridCells;

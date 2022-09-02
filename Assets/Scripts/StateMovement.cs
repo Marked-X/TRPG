@@ -6,9 +6,9 @@ using TMPro;
 
 public class StateMovement : State
 {
-    public GameObject SelectedObject { get; set; }
     public PlayerMovement playerMovement = null;
 
+    private GameObject SelectedObject = null;
     private TextMeshProUGUI movementPointsText = null;
     private GridCell destination = null;
     private bool isMoving = false;

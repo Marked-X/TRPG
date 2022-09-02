@@ -4,13 +4,19 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
-    protected Pathfinding pathfinding = new();
+    protected Pathfinding pathfinding;
     protected Character character = null;
     protected List<GridCell> radius = new List<GridCell>();
 
     protected int maxMovementPoints = 4;
     protected int currentMovementPoints = 4;
     public int CurrentMovementPoints { get => currentMovementPoints; private set => currentMovementPoints = value; }
+
+    protected void Start()
+    {
+        pathfinding =  GameController.Instance.pathfinding;
+        character = gameObject.GetComponent<Character>();
+    }
 
     public void RefreshMovementPoints()
     {
@@ -29,7 +35,7 @@ public class Movement : MonoBehaviour
     {
         foreach (GridCell cell in GameController.Instance.gridCells)
         {
-            cell.IsInRadius = false;
+            cell.IsInWalkRadius = false;
         }
     }
 
@@ -58,7 +64,7 @@ public class Movement : MonoBehaviour
             if (temp != null && temp.Count <= currentMovementPoints)
             {
                 radius.Add(cell);
-                cell.IsInRadius = true;
+                cell.IsInWalkRadius = true;
             }
         }
     }

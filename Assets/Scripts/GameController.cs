@@ -11,6 +11,7 @@ public class GameController : MonoBehaviour
     public GameObject player = null;
     public TextMeshProUGUI movementPointsText = null;
     public TextMeshProUGUI turnNumberText = null;
+    public TargetInfo targetInfo = null;
 
     public GameObject gridcellPrefab = null;
 
@@ -19,6 +20,7 @@ public class GameController : MonoBehaviour
 
     public GridCell[,] gridCells = null;
 
+    public Pathfinding pathfinding = new();
 
     private State currentState = null;
     private static StateMovement moving = new StateMovement();
@@ -27,7 +29,6 @@ public class GameController : MonoBehaviour
     private GameObject[] currentCharacters = null;
 
     private int partySize = 1;
-    private int encounterSize = 0;
 
     private int currentCharacterIndex = 0;
     private int turnCount = 1;
@@ -36,18 +37,14 @@ public class GameController : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-    }
-
-    void Start()
-    {
         currentState = idle;
         gridCells = new GridCell[gridWidth, gridHeight];
 
         int i = 0, j = 0;
 
-        foreach(Transform cell in grid.transform)
+        foreach (Transform cell in grid.transform)
         {
-            cell.gameObject.GetComponent<GridCell>().Position = new Vector2(i, j);
+            cell.GetComponent<GridCell>().Position = new Vector2(i, j);
 
             gridCells[i, j] = cell.GetComponent<GridCell>();
             if (++i == gridWidth)
@@ -56,11 +53,16 @@ public class GameController : MonoBehaviour
                 j++;
             }
         }
+    }
+
+    void Start()
+    {
+        
+        pathfinding.Ready();
 
         player.GetComponent<Character>().SetPosition(gridCells[4, 3]);
-        player.GetComponent<PlayerMovement>().Ready();
 
-        currentCharacters = new GameObject[partySize + encounterSize];
+        currentCharacters = new GameObject[partySize];
         currentCharacters[0] = player;
 
         currentState.Enter(player);
@@ -89,18 +91,29 @@ public class GameController : MonoBehaviour
     {
         currentState.Leave();
         currentState = moving;
-        currentState.Enter(player);
+        currentState.Enter(currentCharacters[currentCharacterIndex]);
     }
 
     public void AttackButtonActionPressed()
     {
         currentState.Leave();
         currentState = attack;
-        currentState.Enter(player);
+        currentState.Enter(currentCharacters[currentCharacterIndex]);
     }
 
     public void NextTurnButton()
     {
         NextTurn();
+    }
+
+    public void StartAnEncounter(Encounter encounter)
+    {
+        currentCharacters = new GameObject[partySize + encounter.encounterSize];
+        currentCharacters[0] = player;
+        int i = 1;
+        foreach(GameObject enemy in encounter.enemies)
+        {
+            currentCharacters[i++] = enemy;
+        }
     }
 }
