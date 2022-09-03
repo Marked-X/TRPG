@@ -1,34 +1,24 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Pathfinding
 {
     private GridCell[,] gridCells = null;
-
     private int gridWidth;
     private int gridHeight;
+
     private List<GridCell> openList;
     private List<GridCell> closedList;
-    private Vector3[] directions = new Vector3[4] { Vector3.up, Vector3.down, Vector3.left, Vector3.right };
+    private readonly Vector3[] directions = new Vector3[4] { Vector3.up, Vector3.down, Vector3.left, Vector3.right };
 
     private GridCell start = null;
     private GridCell finish = null;
-
-    public Pathfinding() { }
 
     public Pathfinding(GridCell[,] gridCells, int gridWidth, int gridHeight)
     {
         this.gridCells = gridCells;
         this.gridWidth = gridWidth;
         this.gridHeight = gridHeight;
-    }
-
-    public void Ready()
-    {
-        gridCells = GameController.Instance.gridCells;
-        gridWidth = GameController.Instance.gridWidth;
-        gridHeight = GameController.Instance.gridHeight;
     }
 
     public Stack<GridCell> Astar(GridCell a, GridCell b)

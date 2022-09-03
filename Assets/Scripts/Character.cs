@@ -18,7 +18,7 @@ public class Character : MonoBehaviour
 
     private int maxMovementPoints = 4;
     [field: SerializeField]
-    public int CurrentMovementPoints { get; private set; } = 4;
+    public int CurrentMovementPoints { get; set; } = 4;
 
     public int CurrentHealth 
     { 
@@ -32,7 +32,10 @@ public class Character : MonoBehaviour
         }
     }
 
+    public delegate void MovementEndedEventHandler();
 
+    public event MovementEndedEventHandler OnMovementEnded;
+    
     private int maxHealth = 3;
     private int currentHealth = 3;
     private GridCell position = null;
@@ -60,6 +63,11 @@ public class Character : MonoBehaviour
         }
     }
 
+    public void RefreshMovementPoints()
+    {
+        CurrentMovementPoints = maxMovementPoints;
+    }
+
     private void Death()
     {
         //death animation
@@ -67,7 +75,31 @@ public class Character : MonoBehaviour
         GameObject.Destroy(gameObject);
     }
 
-    public IEnumerator Move(GridCell targetCell)
+    public void BeginMoving(Stack<GridCell> path)
+    {
+        StartCoroutine(MoveAlongPath(path));
+    }
+
+    private IEnumerator MoveAlongPath(Stack<GridCell> path)
+    {
+        if (path == null)
+        {
+            Debug.LogWarning("No path");
+            StopCoroutine(MoveAlongPath(path));
+        }
+
+        while (path.Count > 0)
+        {
+            GridCell cell = path.Pop();
+            CurrentMovementPoints--;
+            yield return StartCoroutine(Move(cell));
+            cell.Reset();
+        }
+
+        OnMovementEnded.Invoke();
+    }
+
+    private IEnumerator Move(GridCell targetCell)
     {
         Vector3 targetPos = targetCell.transform.position;
         position.IsOccupied = false;

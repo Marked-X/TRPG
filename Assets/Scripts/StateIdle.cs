@@ -4,12 +4,13 @@ using UnityEngine;
 
 public class StateIdle : State
 {
+    private Character character = null;
+
     public override void Enter(GameObject characterGameObj)
     {
-        PlayerMovement playerMovement = null;
-        if (characterGameObj.TryGetComponent(out playerMovement))
+        if (characterGameObj.TryGetComponent(out character))
         {
-            playerMovement.RefreshMovementPoints();
+            character.RefreshMovementPoints();
         }
     }
 

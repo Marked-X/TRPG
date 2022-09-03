@@ -6,44 +6,44 @@ using TMPro;
 
 public class StateMovement : State
 {
-    public PlayerMovement playerMovement = null;
+    private Stack<GridCell> path = new();
 
+    private Character character = null;
+
+    private GridController gridController = null;
+    private Pathfinding pathfinding = null;
     private GameObject SelectedObject = null;
     private TextMeshProUGUI movementPointsText = null;
     private GridCell destination = null;
     private bool isMoving = false;
-    private bool isFreeroam = false;
+
+    public StateMovement()
+    {
+        gridController = GameController.Instance.gridController;
+        pathfinding = GameController.Instance.pathfinding;
+    }
 
     public override void Enter(GameObject characterGameObj)
     {
-        if(!characterGameObj.TryGetComponent(out playerMovement))
+        if (!characterGameObj.TryGetComponent(out character))
         {
             Debug.LogError("Movement State couldn't find movement component");
             return;
         }
-        playerMovement.OnMovementEnded += OnPlayerMovementEnded;
-        playerMovement.ShowWalkingRadius();
+        gridController.CurrentCharacter = character;
+        gridController.CurrentState = GridController.State.Movement;
+        gridController.ShowRadius();
+        character.OnMovementEnded += MovementEnded;
         movementPointsText = GameController.Instance.movementPointsText;
     }
 
     public override void Leave()
     {
-        foreach(GridCell cell in GameController.Instance.gridCells)
-        {
-            cell.ResetVisuals();
-        }
-        playerMovement.OnMovementEnded -= OnPlayerMovementEnded;
+        gridController.ResetRadiusCells();
+        character.OnMovementEnded -= MovementEnded;
+        gridController.CurrentState = GridController.State.Default;
     }
 
-    private void OnPlayerMovementEnded()
-    {
-        if (playerMovement.CurrentMovementPoints == 0 && isFreeroam)
-        {
-            playerMovement.RefreshMovementPoints();
-            playerMovement.ShowWalkingRadius();
-        }
-        movementPointsText.text = "Movement: " + playerMovement.CurrentMovementPoints;
-    }
 
     public override void Update()
     {
@@ -59,18 +59,27 @@ public class StateMovement : State
                 SelectedObject = targetObject.transform.gameObject;
                 if (SelectedObject.TryGetComponent<GridCell>(out GridCell temp))
                 {
-                    if ((destination == null || destination != temp) && playerMovement.Trace(temp))
+                    if ((destination == null || destination != temp))
                     {
-                        destination = temp;
+                        path = pathfinding.Astar(character.GetPosition(), temp);
+                        if (path != null)
+                        {
+                            destination = temp;
+                            gridController.TracePath(path);
+                        }                        
                     }
                     else if (destination == temp)
                     {
-                        playerMovement.MovePlayer();
+                        character.BeginMoving(path);
                     }
                 }
             }
         }
     }
 
-
+    private void MovementEnded()
+    {
+        gridController.ShowRadius();
+        movementPointsText.text = "Movement: " + character.CurrentMovementPoints;
+    }
 }

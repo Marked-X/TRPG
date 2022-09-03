@@ -12,6 +12,7 @@ public class GameController : MonoBehaviour
     public TextMeshProUGUI movementPointsText = null;
     public TextMeshProUGUI turnNumberText = null;
     public TargetInfo targetInfo = null;
+    public GridController gridController = null;
 
     public GameObject gridcellPrefab = null;
 
@@ -20,12 +21,13 @@ public class GameController : MonoBehaviour
 
     public GridCell[,] gridCells = null;
 
-    public Pathfinding pathfinding = new();
+    public Pathfinding pathfinding;
+
+    private StateMovement moving;
+    private StateAttack attack;
+    private StateIdle idle;
 
     private State currentState = null;
-    private static StateMovement moving = new StateMovement();
-    private static StateAttack attack = new StateAttack();
-    private static StateIdle idle = new StateIdle();
     private GameObject[] currentCharacters = null;
 
     private int partySize = 1;
@@ -37,8 +39,8 @@ public class GameController : MonoBehaviour
     private void Awake()
     {
         Instance = this;
-        currentState = idle;
         gridCells = new GridCell[gridWidth, gridHeight];
+        pathfinding = new(gridCells, gridWidth, gridHeight);
 
         int i = 0, j = 0;
 
@@ -53,12 +55,15 @@ public class GameController : MonoBehaviour
                 j++;
             }
         }
+
+        moving = new();
+        attack = new();
+        idle = new();
+        currentState = idle;
     }
 
     void Start()
     {
-        
-        pathfinding.Ready();
 
         player.GetComponent<Character>().SetPosition(gridCells[4, 3]);
 

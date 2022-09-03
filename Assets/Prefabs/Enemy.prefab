@@ -10,10 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 2764874879260242194}
   - component: {fileID: 8589981179995523201}
-  - component: {fileID: 5519736070764011414}
   - component: {fileID: 9030027822055374301}
   - component: {fileID: 1860629181174465762}
-  - component: {fileID: 3447073862548048024}
   m_Layer: 4
   m_Name: Enemy
   m_TagString: Untagged
@@ -52,18 +50,7 @@ MonoBehaviour:
   <Attack>k__BackingField: {fileID: 11400000, guid: 6426919711953624e97147bee4e09385, type: 2}
   <Name>k__BackingField: Enemy
   <DefaultSprite>k__BackingField: {fileID: 1015788235, guid: 44fe60abe86dfbe4fb7b50a8fe4cdf0b, type: 3}
---- !u!114 &5519736070764011414
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1361470521990122018}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b2874deea7da07a40afcda27d36b6bb3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  <CurrentMovementPoints>k__BackingField: 4
 --- !u!212 &9030027822055374301
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -136,15 +123,3 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &3447073862548048024
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1361470521990122018}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8454b826453770e45892f7d5fa01353b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

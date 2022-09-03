@@ -1,19 +1,28 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CellController : MonoBehaviour
+public class GridController : MonoBehaviour
 {
-    private Pathfinding pathfinding;
-    private Character character = null;
+    public enum State
+    {
+        Default,
+        Movement,
+        Skill
+    }
+
+    public Character CurrentCharacter { get; set; }
+    public State CurrentState { get; set; }
+
     private GridCell[,] gridCells = null;
+    private Pathfinding pathfinding = null;
     private List<GridCell> radius = new();
-    private Stack<GridCell> path = new();
 
     void Start()
     {
         gridCells = GameController.Instance.gridCells;
-        pathfinding = new(gridCells, GameController.Instance.gridWidth, GameController.Instance.gridHeight);
+        pathfinding = GameController.Instance.pathfinding;
     }
 
     private void ReadyCells()
@@ -24,7 +33,7 @@ public class CellController : MonoBehaviour
         }
     }
 
-    protected void ResetRadiusCells()
+    public void ResetRadiusCells()
     {
         foreach (GridCell cell in radius)
         {
@@ -32,7 +41,25 @@ public class CellController : MonoBehaviour
         }
     }
 
-    public void ShowWalkingRadius()
+    public void ShowRadius(int range = 0)
+    {
+        ResetRadiusCells();
+        switch (CurrentState)
+        {
+            case State.Movement:
+                ShowWalkingRadius();
+                break;
+            case State.Skill:
+                ShowSkillRadius(range);
+                break;
+            case State.Default:
+            default:
+                Debug.LogError("Show Radius in grid controller doesn't know current state!");
+                break;
+        }
+    }
+
+    private void ShowWalkingRadius()
     {
         radius.Clear();
 
@@ -40,9 +67,9 @@ public class CellController : MonoBehaviour
 
         foreach (GridCell cell in gridCells)
         {
-            if (pathfinding.ManhattanDistance(character.transform.position, cell.transform.position) <= character.CurrentMovementPoints)
+            if (pathfinding.ManhattanDistance(CurrentCharacter.transform.position, cell.transform.position) <= CurrentCharacter.CurrentMovementPoints)
             {
-                if (cell != character.GetPosition())
+                if (cell != CurrentCharacter.GetPosition())
                 {
                     tempRadius.Add(cell);
                 }
@@ -53,8 +80,8 @@ public class CellController : MonoBehaviour
         foreach (GridCell cell in tempRadius)
         {
             ReadyCells();
-            temp = pathfinding.Astar(character.GetPosition(), cell);
-            if (temp != null && temp.Count <= character.CurrentMovementPoints)
+            temp = pathfinding.Astar(CurrentCharacter.GetPosition(), cell);
+            if (temp != null && temp.Count <= CurrentCharacter.CurrentMovementPoints)
             {
                 radius.Add(cell);
                 cell.IsInWalkRadius = true;
@@ -62,15 +89,15 @@ public class CellController : MonoBehaviour
         }
     }
 
-    public void ShowSkillRadius(int range)
+    private void ShowSkillRadius(int range)
     {
         radius.Clear();
 
         foreach (GridCell cell in gridCells)
         {
-            if (pathfinding.ManhattanDistance(character.transform.position, cell.transform.position) <= range)
+            if (pathfinding.ManhattanDistance(CurrentCharacter.transform.position, cell.transform.position) <= range)
             {
-                if (cell != character.GetPosition())
+                if (cell != CurrentCharacter.GetPosition())
                 {
                     radius.Add(cell);
                     cell.IsInSkillRadius = true;
@@ -79,26 +106,12 @@ public class CellController : MonoBehaviour
         }
     }
 
-    public bool Trace(GridCell finish)
+    public void TracePath(Stack<GridCell> path)
     {
-        if (!radius.Contains(finish) || finish.IsOccupied)
-            return false;
-
-        GridCell start = character.GetPosition();
-        ReadyCells();
-        if (path != null)
-            path.Clear();
-        path = pathfinding.Astar(start, finish);
-
-        if (path.Count <= 0 || path == null)
-            return false;
-
         foreach (GridCell cell in path)
         {
             cell.IsPath = true;
         }
-
-        return true;
     }
 
     private void ResetTargetCells()

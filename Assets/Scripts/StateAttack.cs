@@ -4,31 +4,33 @@ using UnityEngine;
 
 public class StateAttack : State
 {
+    private GridController gridController = null;
     private GameObject selectedObject = null;
     private GridCell target = null;
-    private PlayerTargeting playerTargeting = null;
     private Character character = null;
     private bool hasAttacked = false;
 
+    public StateAttack()
+    {
+        gridController = GameController.Instance.gridController;
+    }
+
     public override void Enter(GameObject characterGameObj)
     {
-        if (!characterGameObj.TryGetComponent(out playerTargeting))
-        {
-            Debug.LogError("Attack State couldn't find targeting component");
-            return;
-        }
         if (!characterGameObj.TryGetComponent(out character))
         {
             Debug.LogError("Attack State couldn't find character component");
             return;
         }
-        playerTargeting.ShowSkillRadius(character.Attack.range);
+        gridController.CurrentCharacter = character;
+        gridController.CurrentState = GridController.State.Skill;
+        gridController.ShowRadius(character.Attack.range);
         hasAttacked = false;
     }
 
     public override void Leave()
     {
-        playerTargeting.ResetRadiusCells();
+        gridController.ResetRadiusCells();
     }
 
     public override void Update()
@@ -42,7 +44,7 @@ public class StateAttack : State
                 selectedObject = targetObject.transform.gameObject;
                 if (selectedObject.TryGetComponent<GridCell>(out GridCell temp))
                 {
-                    if ((target == null || target != temp) && playerTargeting.TargetCell(temp))
+                    if ((target == null || target != temp) && gridController.TargetCell(temp))
                     {
                         target = temp;
                     }
